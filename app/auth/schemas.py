@@ -9,7 +9,7 @@ class RegisterRequest(BaseModel):
    name: str
    email: EmailStr
    mobile: str = Field(...,min_length=10,max_length=15)
-   monthly_amount = str
+   monthly_amount: str
    address: str =Field(...,min_length=5, max_length=80)
    password: str = Field(...,min_length=6,max_length=20)
 
