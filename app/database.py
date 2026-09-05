@@ -25,6 +25,7 @@ class Base(DeclarativeBase):
     pass
 
 def create_tables():
+    from app.models import (Donors, Donations, Payments,Users, Receipts,Expenses)
     Base.metadata.create_all(bind=engine)
 
 def get_db():
