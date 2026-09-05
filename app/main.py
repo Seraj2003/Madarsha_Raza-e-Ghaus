@@ -1,21 +1,34 @@
 from fastapi import FastAPI
 # from app.config import settings
+from contextlib import asynccontextmanager
 from app.exceptions.handler import unexcepted_exception_handler, integrity_error_handler
 from sqlalchemy.exc import IntegrityError
 from app.auth.router import auth_router
 from app.donors.router import donor_router
 from app.donations.router import donation_router
 from app.admin.router import admin_router
-from app.database import engine
+from app.database import engine, create_tables
 
 
-async def lifespan(app :FastAPI):
-        engine.connect()
-        print("database connected")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Connect to database and create tables
+    try:
+        with engine.connect() as connection:
+            print("Database connected successfully")
+
+        create_tables()
+        print("Database tables created/verified successfully")
+
         yield
 
-        engine.close()
-        print("database disconnected")
+    except Exception as e:
+        print(f"Database startup error: {e}")
+        raise
+
+    finally:
+        engine.dispose()
+        print("Database connection pool closed")
 
 
 app = FastAPI(
