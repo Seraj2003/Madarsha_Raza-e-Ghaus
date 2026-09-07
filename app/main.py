@@ -3,10 +3,13 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.exceptions.handler import unexcepted_exception_handler, integrity_error_handler
 from sqlalchemy.exc import IntegrityError
+#importing routes
 from app.auth.router import auth_router
 from app.donors.router import donor_router
 from app.donations.router import donation_router
-from app.admin.router import admin_router
+# from app.admin.router import admin_router
+from app.payments.router import payment_router
+
 from app.database import engine, create_tables
 
 
@@ -46,7 +49,8 @@ app.add_exception_handler(IntegrityError,integrity_error_handler)
 app.include_router(auth_router)
 app.include_router(donor_router)
 app.include_router(donation_router)
-app.include_router(admin_router)
+app.include_router(payment_router)
+# app.include_router(admin_router)
 
 # print(settings.DATABASE_URL)
 @app.get("/")

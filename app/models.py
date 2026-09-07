@@ -132,6 +132,7 @@ class Payments(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     payment_id: Mapped[Optional[str]] = mapped_column(String(100))
     payment_method: Mapped[Optional[str]] = mapped_column(String(50))
+    donation_type: Mapped[Optional[DonationType]] = mapped_column(Enum(DonationType, values_callable=lambda cls: [member.value for member in cls], name='donation_type'))
 
     donor: Mapped['Donors'] = relationship('Donors', back_populates='payments')
     donations: Mapped[Optional['Donations']] = relationship('Donations', uselist=False, back_populates='payment')
@@ -174,6 +175,7 @@ class Donations(Base):
 class Receipts(Base):
     __tablename__ = 'receipts'
     __table_args__ = (
+        CheckConstraint("status::text = ANY (ARRAY['issued'::character varying, 'cancelled'::character varying]::text[])", name='chk_receipts_status'),
         ForeignKeyConstraint(['donation_id'], ['donations.id'], name='receipts_donation_id_fkey'),
         PrimaryKeyConstraint('id', name='receipts_pkey'),
         UniqueConstraint('donation_id', name='receipts_donation_id_key'),
@@ -183,6 +185,11 @@ class Receipts(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     donation_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     receipt_number: Mapped[str] = mapped_column(String(50), nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'issued'::character varying"))
+    issued_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
+    amount: Mapped[decimal.Decimal] = mapped_column(Numeric(12, 2), nullable=False, server_default=text('12'))
     issued_date: Mapped[Optional[datetime.date]] = mapped_column(Date, server_default=text('CURRENT_DATE'))
+    cancelled_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True))
+    cancellation_reason: Mapped[Optional[str]] = mapped_column(Text)
 
     donation: Mapped['Donations'] = relationship('Donations', back_populates='receipts')

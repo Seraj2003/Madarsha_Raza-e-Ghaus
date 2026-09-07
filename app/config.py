@@ -5,6 +5,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES:str
     ALGORITHM : str
     JWT_SECRET_KEY : str
+    
+    RAZORPAY_KEY_ID: str
+    RAZORPAY_KEY_SECRET: str
+    RAZORPAY_WEBHOOK_SECRET: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
