@@ -187,7 +187,8 @@ class Receipts(Base):
     receipt_number: Mapped[str] = mapped_column(String(50), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'issued'::character varying"))
     issued_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
-    amount: Mapped[decimal.Decimal] = mapped_column(Numeric(12, 2), nullable=False, server_default=text('12'))
+    amount: Mapped[decimal.Decimal] = mapped_column(
+    Numeric(12, 2), nullable=False)
     issued_date: Mapped[Optional[datetime.date]] = mapped_column(Date, server_default=text('CURRENT_DATE'))
     cancelled_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True))
     cancellation_reason: Mapped[Optional[str]] = mapped_column(Text)
