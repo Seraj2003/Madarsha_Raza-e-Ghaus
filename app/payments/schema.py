@@ -24,7 +24,7 @@ class PaymentVerifyRequest(BaseModel):
 
 class PaymentSuccessResponse(BaseModel):
     message: str
-    payment_id: str
+    payment_id: int
     donation_id: int
-    receipt_id: str
+    receipt_id: int
     receipt_number: str

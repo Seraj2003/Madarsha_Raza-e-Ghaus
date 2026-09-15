@@ -38,7 +38,7 @@ def create_donation(
     donor_id=payment.donor_id,
     type=payment.donation_type,       # currently None
     amount=payment.amount,
-    payment_mode="online",            # currently None
+    payment_mode="UPI",            # currently None
     donation_month=now.month,
     donation_year=now.year,
     transaction_reference=payment.payment_id,

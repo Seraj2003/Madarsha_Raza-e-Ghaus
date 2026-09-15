@@ -42,7 +42,7 @@ def get_payment_order(
         donor_id=donor_id,
         provider="razorpay",
         order_id=order["id"],
-        type=body.donation_type,
+        donation_type=body.donation_type, 
         amount=body.amount,
         payment_method="Online",
         currency="INR",
@@ -137,18 +137,16 @@ def get_verify_order(
 
         payment.status = "success"
         payment.signature_verified = True
-        payment.donation_type = body.donation_type
+
 
         # --------------------------------
         # 5. Create donation
-        # --------------------------------
-
+        # ----- ---------------------------
+        print(payment.donation_type)
         donation = create_donation(
-            donation_type=body.donation_type,
             payment=payment,
             db=db
         )
-
         # --------------------------------
         # 6. Create receipt
         # --------------------------------
@@ -165,17 +163,17 @@ def get_verify_order(
         db.commit()
 
         return PaymentSuccessResponse(
-            message="Payment successful",
-            payment_id=payment.id,
-            donation_id=donation.id,
-            receipt_number=receipt.receipt_number
+           message="Payment successful",
+           payment_id=payment.id,
+           donation_id=donation.id,
+           receipt_id=receipt.id,
+           receipt_number=receipt.receipt_number
         )
-
-    except Exception as error:
+ 
+    except Exception as e:
+        print(type(e).__name__)
 
         db.rollback()
-
-        print("PAYMENT PROCESSING ERROR:", error)
 
         raise HTTPException(
             status_code=500,
