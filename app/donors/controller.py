@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import extract, func
 from app.database import get_db
 from app.dependencies.auth import get_current_donor
-from app.models import Donors,Donations,Expenses
+from app.models import Donors,Donations,Expenses,Receipts,Payments
 from datetime import datetime
-from app.donors.schemas import DonorDashboardResponse,DonorProfileResponse
+from app.donors.schemas import DonorDashboardResponse,DonorProfileResponse,DonationData,PaymentData, ReceiptResponse, ReceiptData,DonorData
 from decimal import Decimal
 
 
@@ -281,3 +281,75 @@ def get_dashboard(
             "blance": balance
         }
     )
+
+def get_receipt_status(receipt_number:str,db:Session = Depends(get_db)):
+    result = (
+        db.query(
+            Receipts,
+            Donations,
+            Donors,
+            Payments
+        )
+        .join(
+            Donations,
+            Receipts.donation_id == Donations.id
+        )
+        .join(
+            Donors,
+            Donations.donor_id == Donors.id
+        )
+        .outerjoin(
+            Payments,
+            Donations.payment_id == Payments.id
+        )
+        .filter(
+            Receipts.receipt_number == receipt_number
+        )
+        .first()
+    )
+     
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Receipt Not Found. Enter Valid Receipt Number"
+        )
+    print(result)
+
+    receipt, donation, donor, payment = result
+
+    return ReceiptResponse(
+    message="success",
+
+    receipt=ReceiptData(
+        receipt_number=receipt.receipt_number,
+        generated_at=receipt.issued_at,
+        status=receipt.status,
+
+        cancellation_reason=(
+            receipt.cancellation_reason
+            if receipt.status == "cancelled"
+            else None
+        ),
+
+        cancelled_at=receipt.cancelled_at,
+    ),
+
+    donor=DonorData(
+        id=donor.id,
+        name=donor.name,
+        mobile=donor.mobile,
+        address=donor.address,
+    ),
+
+    donation=DonationData(
+        amount=donation.amount,
+        donation_type=donation.type,
+        month=donation.donation_month,
+        year=donation.donation_year,
+    ),
+
+    payment=PaymentData(
+        payment_id=payment.payment_id if payment else None,
+        status=payment.status if payment else None,
+    ),
+)

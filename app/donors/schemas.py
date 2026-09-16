@@ -41,4 +41,40 @@ class DonorProfileResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
-    
+
+
+class ReceiptData(BaseModel):
+    receipt_number: str
+    generated_at: datetime
+    status: str
+
+    cancellation_reason: str | None = None
+    cancelled_at: datetime | None = None
+
+
+class DonorData(BaseModel):
+    id: int
+    name: str
+    mobile: str | None = None
+    address: str | None = None
+
+
+class DonationData(BaseModel):
+    amount: Decimal
+    donation_type: str
+    month: int | None = None
+    year: int | None = None
+
+
+class PaymentData(BaseModel):
+    payment_id: str | None = None
+    status: str | None = None
+
+
+class ReceiptResponse(BaseModel):
+    message: str
+
+    receipt: ReceiptData
+    donor: DonorData
+    donation: DonationData
+    payment: PaymentData

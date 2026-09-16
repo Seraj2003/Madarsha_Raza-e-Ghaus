@@ -2,7 +2,7 @@ from fastapi import FastAPI,Depends,APIRouter,status
 from app.models import Donors
 from sqlalchemy.orm import Session
 from app.dependencies.auth import get_current_donor
-from app.donors.schemas import DonorDashboardResponse,DonorProfileResponse
+from app.donors.schemas import DonorDashboardResponse,DonorProfileResponse,ReceiptResponse
 from app.database import get_db
 from app.donors import controller
 donor_router = APIRouter(prefix="/donor",tags=["Donors"])
@@ -18,4 +18,6 @@ def dashboard(current_donor: Donors = Depends(get_current_donor),db:Session = De
 def profile(current_donor : Donors = Depends(get_current_donor), db: Session = Depends(get_db)):
      return controller.get_profile(current_donor,db)
 
-
+@donor_router.get("/receipt/status/{receipt_number}",status_code=status.HTTP_200_OK,response_model=ReceiptResponse)
+def receipt_status(receipt_number: str, db: Session= Depends(get_db)):
+     return controller.get_receipt_status(receipt_number,db)

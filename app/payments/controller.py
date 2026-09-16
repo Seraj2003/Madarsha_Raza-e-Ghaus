@@ -166,7 +166,6 @@ def get_verify_order(
            message="Payment successful",
            payment_id=payment.id,
            donation_id=donation.id,
-           receipt_id=receipt.id,
            receipt_number=receipt.receipt_number
         )
  
